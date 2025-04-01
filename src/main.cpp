@@ -1,6 +1,5 @@
 #include "raylib.h" // should use "raylib.h" instead of <raylib.h> since the raylib headers are included locally in this project
-#include "grid.h"
-#include "blocks.cpp"
+#include "game.h"
 
 int main() 
 {
@@ -13,20 +12,14 @@ int main()
     InitWindow(screenWidth, screenHeight, "raylib Tetris");
     SetTargetFPS(60);
 
-    Grid grid = Grid();
-    // grid.grid[1][2] = 2;
-    grid.Print();
+    Game game = Game();
 
-    ZBlock block = ZBlock();
-    block.Move(4,3);
     
     while (!WindowShouldClose())
     {
         BeginDrawing();
         ClearBackground(darkBlue);
-        grid.Draw();
-        block.Draw();
-
+        game.Draw();
         // Get FPS value and draw it in a custom color
         int fps = GetFPS();  
         DrawText(TextFormat("FPS: %d", fps), 10, 10, 20, WHITE); 
