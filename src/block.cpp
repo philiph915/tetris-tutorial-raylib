@@ -17,13 +17,32 @@ void Block::Draw()
     {
         DrawRectangle(item.column * cellSize+1, item.row * cellSize+1, cellSize-1, cellSize-1, colors[id]);
     }
-
 }
 
 void Block::Move(int rows, int columns) 
 {
     rowOffset += rows;
     columnOffset += columns;
+}
+
+void Block::Rotate()
+{
+    rotationState++;
+    
+    // wrap back to 0
+    if (rotationState==cells.size())
+    {
+        rotationState=0;
+    }
+}
+
+void Block::UndoRotation()
+{
+    rotationState--;
+    if (rotationState==-1)
+    {
+        rotationState=cells.size()-1;
+    }
 }
 
 std::vector<Position> Block::GetCellPositions()

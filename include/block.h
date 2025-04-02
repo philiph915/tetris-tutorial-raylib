@@ -10,8 +10,11 @@ public:
     Block();
     void Draw();
     void Move(int rows, int columns);
+    void Rotate();
+    void UndoRotation();
     std::vector<Position> GetCellPositions();
     int id; // id defines the color of the block
+    
 
     // Cells is a "map" in which a rotation state is a key associated with a vector of Position objects called cells
     // cells is indexed as if it is an array, i.e. each key is just an integer value that gets assigned in the blocks.cpp file

@@ -1,6 +1,20 @@
 #include "raylib.h" // should use "raylib.h" instead of <raylib.h> since the raylib headers are included locally in this project
 #include "game.h"
 
+double lastUpdateTime = 0;
+
+// this timer resets every time it returns true
+bool EventTriggered(double interval)
+{
+    double currentTime = GetTime();
+    if (currentTime - lastUpdateTime >= interval)
+    {
+        lastUpdateTime = currentTime;
+        return true;
+    }
+    return false;
+}
+
 int main() 
 {
     const Color darkGreen = {20, 160, 133, 255};
@@ -17,6 +31,11 @@ int main()
     
     while (!WindowShouldClose())
     {
+        game.HandleInput();
+        if (EventTriggered(0.2))
+        {
+            game.MoveBlockDown();
+        }
         BeginDrawing();
         ClearBackground(darkBlue);
         game.Draw();
