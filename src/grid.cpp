@@ -67,3 +67,54 @@ bool Grid::IsCellEmpty(int row, int column)
     }
     return false;
 }
+
+int Grid::ClearFullRows()
+{
+    int completed = 0;
+    for (int row = numRows-1; row >= 0; row--)
+    {
+        if (IsRowFull(row))
+        {
+            ClearRow(row);
+            completed++;
+        }
+        else if (completed > 0)
+        {
+            MoveRowDown(row, completed);
+        }
+    }
+    return completed;
+}
+
+// Function to check if a specific row does not contain any 0's 
+bool Grid::IsRowFull(int row)
+{
+    for (int column = 0; column < numCols; column++)
+    {
+        if (grid[row][column] == 0)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+// Function to set all cells in a given row to 0
+void Grid::ClearRow(int row)
+{
+    for (int column = 0; column < numCols; column++)
+    {
+        grid[row][column] = 0;
+    }
+}
+
+// Function to move a row down by a number of rows
+void Grid::MoveRowDown(int row, int nRows)
+{
+    for (int column = 0; column < numCols; column++)
+    {
+        // copy the values from the current row to a new row nRows down, then clear the original row
+        grid[row+nRows][column] = grid[row][column];
+        grid[row][column] = 0;
+    }
+}

@@ -7,6 +7,7 @@ Game::Game()
     blocks = GetAllBlocks();
     currentBlock = GetRandomBlock();
     nextBlock = GetRandomBlock();
+    gameOver = false;
 }
 Block Game::GetRandomBlock()
 {
@@ -49,24 +50,35 @@ void Game::Draw()
 // Function for detecting user input and moving the blocks accordingly
 void Game::HandleInput()
 {
+    // Get all keys that are pressed (returns 0 for no keys pressed)
     int keyPressed = GetKeyPressed();
-    switch (keyPressed)
+
+    // Allow the user to move the current block if the game is not over
+    if (gameOver == false)
     {
-        case KEY_LEFT:
+        switch (keyPressed)
+        {
+            case KEY_LEFT:
             MoveBlockLeft();
-        break;
-
-        case KEY_RIGHT:
+            break;
+            
+            case KEY_RIGHT:
             MoveBlockRight();
-        break;
-
-        case KEY_UP:
+            break;
+            
+            case KEY_UP:
             RotateBlock();
-        break;
-
-        case KEY_DOWN:
+            break;
+            
+            case KEY_DOWN:
             MoveBlockDown();
-        break;
+            break;
+        }
+    }
+    // If the game is over and a key is pressed, reset the game
+    else if (gameOver && keyPressed != 0)
+    {
+        Reset();
     }
 }
 
@@ -92,13 +104,27 @@ void Game::MoveBlockRight()
 
 void Game::MoveBlockDown()
 {
-    currentBlock.Move(1,0);
-    // if moving the block down causes it to exit the screen or collide with another block, lock it in place
-    if (IsBlockOutside() || BlockFits() == false)
-    {
-        currentBlock.Move(-1,0);
-        LockBlock();
+    // Do not make blocks fall if the game is over
+    if (gameOver == false)
+        {
+        currentBlock.Move(1,0);
+        // if moving the block down causes it to exit the screen or collide with another block, lock it in place
+        if (IsBlockOutside() || BlockFits() == false)
+        {
+            currentBlock.Move(-1,0);
+            LockBlock();
+        }
     }
+}
+
+// Function to clear the grid, reset the list of blocks, and draw the current and next block
+void Game::Reset()
+{
+    grid.Initialize();
+    gameOver = false;
+    blocks = GetAllBlocks();
+    currentBlock = GetRandomBlock();
+    nextBlock = GetRandomBlock();
 }
 
 void Game::RotateBlock()
@@ -111,18 +137,31 @@ void Game::RotateBlock()
     }
 }
 
-// Function to move a block from currentBlock to the game grid
+// Function to move a block from currentBlock to the game grid and clear full rows
 void Game::LockBlock()
 {
+    // update the grid with the current block to be locked
     std::vector<Position> tiles = currentBlock.GetCellPositions();
     for (Position item: tiles)
     {
         // update the map object (grid) with the ID of each cell of the current block in its current location
         grid.grid[item.row][item.column] = currentBlock.id; 
     }
+    
     // spawn a new block
     currentBlock = nextBlock;
+
+    // if the newly spawned block does not fit in the grid, the game ends
+    if (BlockFits() == false)
+    {
+        gameOver = true;
+    }
+
+    // draw the next block
     nextBlock = GetRandomBlock();
+
+    // remove rows that have been filled by the placement of this block
+    grid.ClearFullRows(); 
 }
 
 
