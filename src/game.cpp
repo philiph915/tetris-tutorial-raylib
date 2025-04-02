@@ -1,6 +1,8 @@
 #include "game.h"
 #include <random>
+#include "raylib.h"
 
+// Constructor method
 Game::Game()
 {
     grid = Grid();
@@ -8,7 +10,10 @@ Game::Game()
     currentBlock = GetRandomBlock();
     nextBlock = GetRandomBlock();
     gameOver = false;
+    lastUpdateTime = 0;
 }
+
+// Function to return a random Block object from the list of available blocks, and remove that block from the list
 Block Game::GetRandomBlock()
 {
     if (blocks.empty())
@@ -27,6 +32,7 @@ std::vector<Block> Game::GetAllBlocks()
     return {IBlock(), JBlock(), LBlock(), OBlock(), SBlock(), TBlock(), ZBlock()};
 }
 
+// Function to test if a block is outside the game grid
 bool Game::IsBlockOutside()
 {
     std::vector<Position> tiles = currentBlock.GetCellPositions();
@@ -40,12 +46,12 @@ bool Game::IsBlockOutside()
     return false;
 }
 
+// Function to draw the current block on the grid
 void Game::Draw()
 {
     grid.Draw();
     currentBlock.Draw();
 }
-
 
 // Function for detecting user input and moving the blocks accordingly
 void Game::HandleInput()
@@ -117,11 +123,24 @@ void Game::MoveBlockDown()
     }
 }
 
+// this timer resets every time it returns true
+bool Game::TimerTriggered(double interval)
+{
+    double currentTime = GetTime();
+    if (currentTime - lastUpdateTime >= interval)
+    {
+        lastUpdateTime = currentTime;
+        return true;
+    }
+    return false;
+}
+
 // Function to clear the grid, reset the list of blocks, and draw the current and next block
 void Game::Reset()
 {
     grid.Initialize();
     gameOver = false;
+    lastUpdateTime = GetTime(); // reset the block dropping timer
     blocks = GetAllBlocks();
     currentBlock = GetRandomBlock();
     nextBlock = GetRandomBlock();
