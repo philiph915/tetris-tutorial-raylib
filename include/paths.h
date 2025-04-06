@@ -5,3 +5,4 @@
 const std::string EXECUTABLE_PATH = GetApplicationDirectory(); 
 const std::string FONTS_PATH = EXECUTABLE_PATH + "../Fonts/"; 
 const std::string ASSETS_PATH = EXECUTABLE_PATH + "../Assets/";
+const std::string SOUNDS_PATH = EXECUTABLE_PATH + "../Sounds/";

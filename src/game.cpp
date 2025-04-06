@@ -11,6 +11,16 @@ Game::Game()
     nextBlock = GetRandomBlock();
     gameOver = false;
     lastUpdateTime = 0;
+    score = 0;
+    gameSounds.LoadAsset("rotate","sound");
+    gameSounds.LoadAsset("clear","sound");
+    rotateSound = gameSounds.sounds["rotate"];
+    clearSound = gameSounds.sounds["clear"];
+}
+
+Game::~Game() // destructor method
+{
+    CloseAudioDevice();
 }
 
 // Function to return a random Block object from the list of available blocks, and remove that block from the list
@@ -50,7 +60,19 @@ bool Game::IsBlockOutside()
 void Game::Draw()
 {
     grid.Draw();
-    currentBlock.Draw();
+    currentBlock.Draw(11,11); // Hard coded offset to shift the grid
+    switch (nextBlock.id)
+    {
+    case 3:
+        nextBlock.Draw(255,290); // I-block
+        break;
+    case 4:
+        nextBlock.Draw(255,280); // O-block
+        break;
+    default:
+        nextBlock.Draw(270,270);
+        break;
+    }
 }
 
 // Function for detecting user input and moving the blocks accordingly
@@ -60,7 +82,7 @@ void Game::HandleInput()
     int keyPressed = GetKeyPressed();
 
     // Allow the user to move the current block if the game is not over
-    if (gameOver == false)
+    if (!gameOver)
     {
         switch (keyPressed)
         {
@@ -82,7 +104,7 @@ void Game::HandleInput()
         }
     }
     // If the game is over and a key is pressed, reset the game
-    else if (gameOver && keyPressed != 0)
+    else if (keyPressed != 0)
     {
         Reset();
     }
@@ -112,8 +134,9 @@ void Game::MoveBlockDown()
 {
     // Do not make blocks fall if the game is over
     if (gameOver == false)
-        {
+    {
         currentBlock.Move(1,0);
+        UpdateScore(0,1);
         // if moving the block down causes it to exit the screen or collide with another block, lock it in place
         if (IsBlockOutside() || BlockFits() == false)
         {
@@ -144,6 +167,7 @@ void Game::Reset()
     blocks = GetAllBlocks();
     currentBlock = GetRandomBlock();
     nextBlock = GetRandomBlock();
+    score = 0;
 }
 
 void Game::RotateBlock()
@@ -153,6 +177,10 @@ void Game::RotateBlock()
     if (IsBlockOutside() || BlockFits() == false)
     {
         currentBlock.UndoRotation();
+    }
+    else
+    {
+        PlaySound(rotateSound);
     }
 }
 
@@ -180,7 +208,12 @@ void Game::LockBlock()
     nextBlock = GetRandomBlock();
 
     // remove rows that have been filled by the placement of this block
-    grid.ClearFullRows(); 
+    int rowsCleared = grid.ClearFullRows(); 
+    if (rowsCleared>0)
+    {
+        UpdateScore(rowsCleared, 0);
+        PlaySound(clearSound);
+    }
 }
 
 
@@ -196,4 +229,27 @@ bool Game::BlockFits()
         }
     }
     return true;
+}
+
+void Game::UpdateScore(int linesCleared, int moveDownPoints)
+{
+    switch(linesCleared)
+    {
+        case 1:
+            score += 100;
+            break;
+        case 2:
+            score+=300;
+            break;
+        case 3:
+            score +=500;
+            break;
+        default:
+            if (linesCleared>3)
+            {  
+                score += 800;
+            }
+            break;
+    }
+    score += moveDownPoints;
 }

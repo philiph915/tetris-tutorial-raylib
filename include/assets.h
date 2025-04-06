@@ -12,6 +12,7 @@ public:
     std::map<std::string, Font> fonts;
     std::map<std::string, Texture2D> textures;
     std::map<std::string, Music> music;
+    std::map<std::string, Sound> sounds;
 
     // Function to load a specific asset by type and key
     void LoadAsset(const std::string& key, const std::string& type);
